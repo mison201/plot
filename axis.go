@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/gonum/floats"
-	"github.com/gonum/plot/vg"
-	"github.com/gonum/plot/vg/draw"
+	"github.com/mison201/plot/vg"
+	"github.com/mison201/plot/vg/draw"
 )
 
 // displayPrecision is a sane level of float precision for a plot.

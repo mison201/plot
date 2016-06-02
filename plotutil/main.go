@@ -9,9 +9,9 @@ package main
 import (
 	"math/rand"
 
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/plotter"
-	"github.com/gonum/plot/plotutil"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/plotter"
+	"github.com/mison201/plot/plotutil"
 )
 
 var examples = []struct {

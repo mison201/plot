@@ -9,8 +9,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/vg"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/vg"
 )
 
 func ExampleQuartPlot() {

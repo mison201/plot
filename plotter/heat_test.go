@@ -8,9 +8,9 @@ import (
 	"log"
 	"testing"
 
-	"github.com/gonum/matrix/mat64"
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/palette"
+	"github.com/mison201/matrix/mat64"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/palette"
 )
 
 func ExampleHeatMap() {

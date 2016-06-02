@@ -10,9 +10,9 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/vg"
-	"github.com/gonum/plot/vg/draw"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/vg"
+	"github.com/mison201/plot/vg/draw"
 )
 
 // Histogram implements the Plotter interface,

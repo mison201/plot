@@ -4,8 +4,8 @@ import (
 	"encoding/gob"
 	"image/color"
 
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/plotter"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/plotter"
 )
 
 func init() {

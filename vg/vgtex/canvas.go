@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gonum/plot/vg"
+	"github.com/mison201/plot/vg"
 )
 
 const degPerRadian = 180 / math.Pi

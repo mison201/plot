@@ -13,10 +13,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/gonum/matrix/mat64"
-	"github.com/gonum/plot"
-	"github.com/gonum/plot/palette"
-	"github.com/gonum/plot/vg"
+	"github.com/mison201/matrix/mat64"
+	"github.com/mison201/plot"
+	"github.com/mison201/plot/palette"
+	"github.com/mison201/plot/vg"
 )
 
 var visualDebug = flag.Bool("visual", false, "output images for benchmarks and test data")

@@ -21,8 +21,8 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/gonum/plot/vg"
-	"github.com/gonum/plot/vg/draw"
+	"github.com/mison201/plot/vg"
+	"github.com/mison201/plot/vg/draw"
 )
 
 var (
