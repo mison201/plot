@@ -1,24 +1,12 @@
-# Gonum Plot  [![Build Status](https://travis-ci.org/mison201/plot.svg?branch=master)](https://travis-ci.org/mison201/plot) [![Coverage Status](https://coveralls.io/repos/mison201/plot/badge.svg?branch=master&service=github)](https://coveralls.io/github/mison201/plot?branch=master) [![GoDoc](https://godoc.org/github.com/mison201/plot?status.svg)](https://godoc.org/github.com/mison201/plot)
+# Adding multiple Y axes.  
 
-`gonum/plot` is the new, official fork of code.google.com/p/plotinum.
-It provides an API for building and drawing plots in Go.
-*Note* that this new API is still in flux and may change.
-See the wiki for some [example plots](http://github.com/mison201/plot/wiki/Example-plots).
-
-There is a discussion list on Google Groups: gonum-dev@googlegroups.com.
-
-`gonum/plot` is split into a few packages:
-
-* The `plot` package provides simple interface for laying out a plot and provides primitives for drawing to it.
-* The `plotter` package provides a standard set of `Plotter`s which use the primitives provided by the `plot` package for drawing lines, scatter plots, box plots, error bars, etc. to a plot. You do not need to use the `plotter` package to make use of `gonum/plot`, however: see the wiki for a tutorial on making your own custom plotters.
-* The `plotutil` package contains a few routines that allow some common plot types to be made very easily. This package is quite new so it is not as well tested as the others and it is bound to change.
-* The `vg` package provides a generic vector graphics API that sits on top of other vector graphics back-ends such as a custom EPS back-end, draw2d, SVGo, X-Window and gopdf.
+Merge commit #235 https://github.com/gonum/plot/pull/235
 
 ## Documentation
 
 Documentation is available at:
 
-  https://godoc.org/github.com/mison201/plot
+  https://godoc.org/github.com/gonum/plot
 
 ## Installation
 
@@ -27,6 +15,3 @@ You can get `gonum/plot` using go get:
 `go get github.com/mison201/plot/...`
 
 If you write a cool plotter that you think others may be interested in using, please post to the list so that we can link to it in the `gonum/plot` wiki or possibly integrate it into the `plotter` package.
-# plot
-# plot
-# plot
