@@ -206,7 +206,7 @@ func (p *Plot) Draw(c draw.Canvas) {
 		p.Ys[1].sanitizeRange()
 		y = verticalAxis{*p.Ys[1]}
 		y.AlignRight = true
-		y.draw(padY(p, draw.Crop(c, c.Rectangle.Max.X-75, 0, xheight, 0)))
+		y.draw(padY(p, draw.Crop(c, c.Rectangle.Max.X-85, 0, xheight, 0)))
 	}
 }
 

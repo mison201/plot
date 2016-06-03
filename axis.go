@@ -5,14 +5,13 @@
 package plot
 
 import (
+	"github.com/gonum/floats"
+	"github.com/mison201/plot/vg"
+	"github.com/mison201/plot/vg/draw"
 	"image/color"
 	"math"
 	"strconv"
 	"time"
-
-	"github.com/gonum/floats"
-	"github.com/mison201/plot/vg"
-	"github.com/mison201/plot/vg/draw"
 )
 
 // displayPrecision is a sane level of float precision for a plot.
@@ -21,7 +20,7 @@ const displayPrecision = 4
 // Ticker creates Ticks in a specified range
 type Ticker interface {
 	// Ticks returns Ticks in a specified range
-	Ticks(min, max float64) []Tick
+	Ticks(min, max float64, rangeY, stepY int64) []Tick
 }
 
 // Normalizer rescales values from the data coordinate system to the
@@ -39,6 +38,8 @@ type Axis struct {
 	// values represented by the axis.
 	Min, Max   float64
 	AlignRight bool
+	RangeY     int64
+	StepY      int64
 	Label      struct {
 		// Text is the axis label string.
 		Text string
@@ -189,7 +190,7 @@ func (a *horizontalAxis) size() (h vg.Length) {
 		h -= a.Label.Font.Extents().Descent
 		h += a.Label.Height(a.Label.Text)
 	}
-	if marks := a.Tick.Marker.Ticks(a.Min, a.Max); len(marks) > 0 {
+	if marks := a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY); len(marks) > 0 {
 		if a.drawTicks() {
 			h += a.Tick.Length
 		}
@@ -209,7 +210,7 @@ func (a *horizontalAxis) draw(c draw.Canvas) {
 		y += a.Label.Height(a.Label.Text)
 	}
 
-	marks := a.Tick.Marker.Ticks(a.Min, a.Max)
+	marks := a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY)
 	for _, t := range marks {
 		x := c.X(a.Norm(t.Value))
 		if !c.ContainsX(x) || t.IsMinor() {
@@ -231,8 +232,9 @@ func (a *horizontalAxis) draw(c draw.Canvas) {
 			if !c.ContainsX(x) {
 				continue
 			}
-			start := t.lengthOffset(len)
-			c.StrokeLine2(a.Tick.LineStyle, x, y+start, x, y+len)
+			if t.Label != "" {
+				c.StrokeLine2(a.Tick.LineStyle, x, y+len-5, x, y+len)
+			}
 		}
 		y += len
 	}
@@ -242,7 +244,7 @@ func (a *horizontalAxis) draw(c draw.Canvas) {
 
 // GlyphBoxes returns the GlyphBoxes for the tick labels.
 func (a *horizontalAxis) GlyphBoxes(*Plot, *Axis, *Axis) (boxes []GlyphBox) {
-	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max) {
+	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY) {
 		if t.IsMinor() {
 			continue
 		}
@@ -270,7 +272,7 @@ func (a *verticalAxis) size() (w vg.Length) {
 		w -= a.Label.Font.Extents().Descent
 		w += a.Label.Height(a.Label.Text)
 	}
-	if marks := a.Tick.Marker.Ticks(a.Min, a.Max); len(marks) > 0 {
+	if marks := a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY); len(marks) > 0 {
 		if lwidth := tickLabelWidth(a.Tick.Label, marks); lwidth > 0 {
 			w += lwidth
 			w += a.Label.Width(" ")
@@ -295,13 +297,13 @@ func (a *verticalAxis) draw(c draw.Canvas) {
 	x := c.Min.X
 	config := ConfigAlign{}
 	if a.AlignRight {
-		config.X = -5.2
-		config.Y = 2.5
-		config.Z = 13
+		config.X = -5.7
+		config.Y = 1.5
+		config.Z = 6
 	} else {
 		config.X = 0
 		config.Y = -1
-		config.Z = 0
+		config.Z = -6
 	}
 	if a.Label.Text != "" {
 		x += a.Label.Height(a.Label.Text)
@@ -311,22 +313,11 @@ func (a *verticalAxis) draw(c draw.Canvas) {
 		c.Pop()
 		x += -a.Label.Font.Extents().Descent
 	}
-	marks := a.Tick.Marker.Ticks(a.Min, a.Max)
+	marks := a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY)
 	if w := tickLabelWidth(a.Tick.Label, marks); len(marks) > 0 && w > 0 {
 		x += w
 	}
-	major := false
-	for _, t := range marks {
-		y := c.Y(a.Norm(t.Value))
-		if !c.ContainsY(y) || t.IsMinor() {
-			continue
-		}
-		c.FillText(a.Tick.Label, vg.Point{x, y}, config.Y, -0.5, t.Label)
-		major = true
-	}
-	if major {
-		x += a.Tick.Label.Width(" ")
-	}
+
 	if a.drawTicks() && len(marks) > 0 {
 		len := a.Tick.Length
 		for _, t := range marks {
@@ -334,8 +325,17 @@ func (a *verticalAxis) draw(c draw.Canvas) {
 			if !c.ContainsY(y) {
 				continue
 			}
-			start := t.lengthOffset(len) + config.Z
-			c.StrokeLine2(a.Tick.LineStyle, x+start, y, x+len, y)
+			c.FillText(a.Tick.Label, vg.Point{x, y}, config.Y, -0.5, t.Label)
+		}
+		x += a.Tick.Label.Width(" ")
+		for _, t := range marks {
+			y := c.Y(a.Norm(t.Value))
+			if !c.ContainsY(y) {
+				continue
+			}
+			if t.Label != "" {
+				c.StrokeLine2(a.Tick.LineStyle, x+len+config.Z, y, x+len, y)
+			}
 		}
 		x += len
 	}
@@ -344,7 +344,7 @@ func (a *verticalAxis) draw(c draw.Canvas) {
 
 // GlyphBoxes returns the GlyphBoxes for the tick labels
 func (a *verticalAxis) GlyphBoxes(*Plot, *Axis, *Axis) (boxes []GlyphBox) {
-	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max) {
+	for _, t := range a.Tick.Marker.Ticks(a.Min, a.Max, a.RangeY, a.StepY) {
 		if t.IsMinor() {
 			continue
 		}
@@ -368,19 +368,24 @@ type DefaultTicks struct{}
 var _ Ticker = DefaultTicks{}
 
 // Ticks returns Ticks in a specified range
-func (DefaultTicks) Ticks(min, max float64) (ticks []Tick) {
-	const SuggestedTicks = 3
+func (DefaultTicks) Ticks(min, max float64, rangeY, stepY int64) (ticks []Tick) {
+	var SuggestedTicks int64
+	if rangeY == 0 {
+		SuggestedTicks = 3
+	} else {
+		SuggestedTicks = rangeY
+	}
 	if max < min {
 		panic("illegal range")
 	}
 	tens := math.Pow10(int(math.Floor(math.Log10(max - min))))
 	n := (max - min) / tens
-	for n < SuggestedTicks {
+	for n < float64(SuggestedTicks) {
 		tens /= 10
 		n = (max - min) / tens
 	}
 
-	majorMult := int(n / SuggestedTicks)
+	majorMult := int(n / float64(SuggestedTicks))
 	switch majorMult {
 	case 7:
 		majorMult = 6
@@ -388,6 +393,9 @@ func (DefaultTicks) Ticks(min, max float64) (ticks []Tick) {
 		majorMult = 8
 	}
 	majorDelta := float64(majorMult) * tens
+	if stepY != 0 {
+		majorDelta = float64(stepY)
+	}
 	val := math.Floor(min/majorDelta) * majorDelta
 	prec := maxInt(precisionOf(min), precisionOf(max))
 	for val <= max {
@@ -434,7 +442,7 @@ type LogTicks struct{}
 var _ Ticker = LogTicks{}
 
 // Ticks returns Ticks in a specified range
-func (LogTicks) Ticks(min, max float64) []Tick {
+func (LogTicks) Ticks(min, max float64, rangeY, stepY int64) []Tick {
 	var ticks []Tick
 	val := math.Pow10(int(math.Floor(math.Log10(min))))
 	if min <= 0 {
@@ -463,7 +471,7 @@ type ConstantTicks []Tick
 var _ Ticker = ConstantTicks{}
 
 // Ticks returns Ticks in a specified range
-func (ts ConstantTicks) Ticks(float64, float64) []Tick {
+func (ts ConstantTicks) Ticks(float64, float64, int64, int64) []Tick {
 	return ts
 }
 
@@ -482,7 +490,7 @@ type UnixTimeTicks struct {
 var _ Ticker = UnixTimeTicks{}
 
 // Ticks implements plot.Ticker.
-func (utt UnixTimeTicks) Ticks(min, max float64) []Tick {
+func (utt UnixTimeTicks) Ticks(min, max float64, rangeY, stepY int64) []Tick {
 	if utt.Ticker == nil {
 		utt.Ticker = DefaultTicks{}
 	}
@@ -490,7 +498,7 @@ func (utt UnixTimeTicks) Ticks(min, max float64) []Tick {
 		utt.Format = time.RFC3339
 	}
 
-	ticks := utt.Ticker.Ticks(min, max)
+	ticks := utt.Ticker.Ticks(min, max, rangeY, stepY)
 	for i := range ticks {
 		tick := &ticks[i]
 		if tick.Label == "" {
