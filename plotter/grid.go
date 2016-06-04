@@ -5,11 +5,10 @@
 package plotter
 
 import (
-	"image/color"
-
 	"github.com/mison201/plot"
 	"github.com/mison201/plot/vg"
 	"github.com/mison201/plot/vg/draw"
+	"image/color"
 )
 
 var (
@@ -42,7 +41,6 @@ func NewGrid() *Grid {
 // Plot implements the plot.Plotter interface.
 func (g *Grid) Plot(c draw.Canvas, plt *plot.Plot, xAxis, yAxis *plot.Axis) {
 	trX, trY := plt.Transforms(&c, xAxis, yAxis)
-
 	if g.Vertical.Color == nil {
 		goto horiz
 	}
@@ -58,7 +56,7 @@ horiz:
 	if g.Horizontal.Color == nil {
 		return
 	}
-	for _, tk := range yAxis.Tick.Marker.Ticks(yAxis.Min, yAxis.Max, xAxis.RangeY, xAxis.StepY) {
+	for _, tk := range yAxis.Tick.Marker.Ticks(yAxis.Min, yAxis.Max, yAxis.RangeY, yAxis.StepY) {
 		if tk.IsMinor() {
 			continue
 		}
