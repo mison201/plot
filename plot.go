@@ -180,7 +180,7 @@ func (p *Plot) Draw(c draw.Canvas) {
 		c.Max.Y -= p.Title.Padding
 	}
 	if len(p.Ys) > 1 {
-		marginRight = -50
+		marginRight = -72
 	}
 	p.X.sanitizeRange()
 	x := horizontalAxis{*p.X}
@@ -206,7 +206,7 @@ func (p *Plot) Draw(c draw.Canvas) {
 		p.Ys[1].sanitizeRange()
 		y = verticalAxis{*p.Ys[1]}
 		y.AlignRight = true
-		y.draw(padY(p, draw.Crop(c, c.Rectangle.Max.X-85, 0, xheight, 0)))
+		y.draw(padY(p, draw.Crop(c, c.Rectangle.Max.X-135, 0, xheight, 0)))
 	}
 }
 

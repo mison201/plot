@@ -6,15 +6,14 @@ package draw
 
 import (
 	"fmt"
-	"image/color"
-	"math"
-	"strings"
-
 	"github.com/mison201/plot/vg"
 	"github.com/mison201/plot/vg/vgeps"
 	"github.com/mison201/plot/vg/vgimg"
 	"github.com/mison201/plot/vg/vgpdf"
 	"github.com/mison201/plot/vg/vgsvg"
+	"image/color"
+	"math"
+	"strings"
 )
 
 // A Canvas is a vector graphics canvas along with
@@ -581,6 +580,11 @@ func isect(p0, p1, clip, norm vg.Point) vg.Point {
 // left corner of the text befor e it is offset.
 func (c *Canvas) FillText(sty TextStyle, pt vg.Point, xalign, yalign float64, txt string) {
 	txt = strings.TrimRight(txt, "\n")
+	if len(txt) == 1 {
+		txt = "  " + txt
+	} else if len(txt) == 2 {
+		txt = " " + txt
+	}
 	if len(txt) == 0 {
 		return
 	}

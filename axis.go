@@ -20,7 +20,7 @@ const displayPrecision = 4
 // Ticker creates Ticks in a specified range
 type Ticker interface {
 	// Ticks returns Ticks in a specified range
-	Ticks(min, max float64, rangeY, stepY int64) []Tick
+	Ticks(min, max float64, rangeY int64, stepY float64) []Tick
 }
 
 // Normalizer rescales values from the data coordinate system to the
@@ -39,7 +39,7 @@ type Axis struct {
 	Min, Max   float64
 	AlignRight bool
 	RangeY     int64
-	StepY      int64
+	StepY      float64
 	Label      struct {
 		// Text is the axis label string.
 		Text string
@@ -297,8 +297,8 @@ func (a *verticalAxis) draw(c draw.Canvas) {
 	x := c.Min.X
 	config := ConfigAlign{}
 	if a.AlignRight {
-		config.X = -5.7
-		config.Y = 1.5
+		config.X = -5.9
+		config.Y = 0.7
 		config.Z = 6
 	} else {
 		config.X = 0
@@ -368,7 +368,7 @@ type DefaultTicks struct{}
 var _ Ticker = DefaultTicks{}
 
 // Ticks returns Ticks in a specified range
-func (DefaultTicks) Ticks(min, max float64, rangeY, stepY int64) (ticks []Tick) {
+func (DefaultTicks) Ticks(min, max float64, rangeY int64, stepY float64) (ticks []Tick) {
 	var SuggestedTicks int64
 	if rangeY == 0 {
 		SuggestedTicks = 3
@@ -394,7 +394,7 @@ func (DefaultTicks) Ticks(min, max float64, rangeY, stepY int64) (ticks []Tick) 
 	}
 	majorDelta := float64(majorMult) * tens
 	if stepY != 0 {
-		majorDelta = float64(stepY)
+		majorDelta = stepY
 	}
 	val := math.Floor(min/majorDelta) * majorDelta
 	prec := maxInt(precisionOf(min), precisionOf(max))
@@ -442,7 +442,7 @@ type LogTicks struct{}
 var _ Ticker = LogTicks{}
 
 // Ticks returns Ticks in a specified range
-func (LogTicks) Ticks(min, max float64, rangeY, stepY int64) []Tick {
+func (LogTicks) Ticks(min, max float64, rangeY int64, stepY float64) []Tick {
 	var ticks []Tick
 	val := math.Pow10(int(math.Floor(math.Log10(min))))
 	if min <= 0 {
@@ -471,7 +471,7 @@ type ConstantTicks []Tick
 var _ Ticker = ConstantTicks{}
 
 // Ticks returns Ticks in a specified range
-func (ts ConstantTicks) Ticks(float64, float64, int64, int64) []Tick {
+func (ts ConstantTicks) Ticks(float64, float64, int64, float64) []Tick {
 	return ts
 }
 
@@ -490,7 +490,7 @@ type UnixTimeTicks struct {
 var _ Ticker = UnixTimeTicks{}
 
 // Ticks implements plot.Ticker.
-func (utt UnixTimeTicks) Ticks(min, max float64, rangeY, stepY int64) []Tick {
+func (utt UnixTimeTicks) Ticks(min, max float64, rangeY int64, stepY float64) []Tick {
 	if utt.Ticker == nil {
 		utt.Ticker = DefaultTicks{}
 	}
